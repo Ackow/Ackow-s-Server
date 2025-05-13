@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ackow</title>
+    <link rel="icon" type="image/x-icon" href="./assets/icons/favicon.ico">
+    <link rel="stylesheet" href="./assets/css/main.css">
+    <link rel="stylesheet" href="./assets/css/works.css">
+    <link rel="stylesheet" href="./assets/css/tech.css">
+    <link rel="stylesheet" href="./assets/css/article.css">
+    <!-- 添加 Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div>
+            <!-- 左侧 Logo -->
+            <div class="logo-title">
+                <span data-i18n="title">Ackow</span>
+            </div>
+            
+            <!-- 分隔线 -->
+            <div class="divider"></div>
+            
+            <!-- 中间导航 -->
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="active" data-i18n="nav.home">首页</a></li>
+                    <li><a href="./assets/pages/works.html" data-i18n="nav.works">作品介绍</a></li>
+                    <li><a href="http://blog.ackow.cn" target="_blank" data-i18n="nav.blog">博客</a></li>
+                    <li><a href="./assets/pages/contact.html" data-i18n="nav.contact">联系</a></li>
+                </ul>
+            </nav>
+            
+            <!-- 分隔线 -->
+            <div class="divider"></div>
+            
+            <!-- 右侧工具栏 -->
+            <div class="tools">
+                <button class="icon-button language-switch" title="Switch Language / 切换语言">
+                    <span class="material-icons-round">language</span>
+                    <span class="current-lang">中</span>
+                </button>
+                <button class="icon-button theme-switch" title="Switch Theme / 切换主题">
+                    <span class="material-icons-round">light_mode</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="background-image" style="height: 100vh;">
+        <div class="hero-content">
+            <h1 class="hero-title" data-i18n="hero.title">Ackow</h1>
+            <p class="hero-subtitle" data-i18n="hero.subtitle">用代码构建未来</p>
+        </div>
+    </div>
+
+    <main>
+        <div class="container">
+            <!-- 作品展示部分 -->
+            <section class="works-section">
+                <h2 class="section-title" data-i18n="works.title">作品展示</h2>
+                <div class="works-carousel">
+                    <div class="works-container">
+                        <!-- 卡片将由 JavaScript 动态生成 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 技术栈部分 -->
+            <section class="tech-section">
+                <h2 class="section-title" data-i18n="tech.title">技术栈</h2>
+                <div class="tech-list">
+
+                </div>
+            </section>
+        </div>
+        
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <p class="copyright" data-i18n="footer.copyright">© 2025 Ackow. 保留所有权利。</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 添加 JavaScript 文件 -->
+    <script type="module" src="./assets/js/main.js"></script>
+</body>
+</html>
