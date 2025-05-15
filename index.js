@@ -44,10 +44,13 @@ app.post('/messages', async (req, res) => {
 
     const avatarIndex = Math.floor(Math.random() * AVATAR_COUNT) + 1;
 
-// 获取客户端 IP
-    let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    // 获取客户端 IP，取第一个有效 IP
+    let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || '';
+    if (ip.includes(',')) {
+        ip = ip.split(',')[0].trim();
+    }
     if (ip === '::1' || ip === '127.0.0.1') {
-        ip = '123.125.71.38'; // 模拟一个北京 IP 用于本地测试
+        ip = '123.125.71.38'; // 北京 IP 测试用
     }
 
     const geo = geoip.lookup(ip);
