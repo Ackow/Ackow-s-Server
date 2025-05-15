@@ -2,17 +2,13 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const Message = require('./models/Message');  // 确保你已经创建了这个模型
+const axios = require('axios'); // 新增 axios
+const Message = require('./models/Message');
 require('dotenv').config();
-const geoip = require('geoip-lite');
-
 
 const app = express();
 const port = process.env.PORT || 3000;
 const AVATAR_COUNT = 5;
-
-console.log(process.env.MONGODB_URI);  // 查看是否正确加载了 MONGODB_URI
-
 
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
@@ -27,80 +23,79 @@ app.use(bodyParser.json());
 
 // 获取所有留言
 app.get('/messages', async (req, res) => {
-    try {
-        const messages = await Message.find().sort({ createdAt: 1 }); // 按时间升序排序
-        res.json(messages);
-    } catch (err) {
-        res.status(500).json({ error: '获取留言失败' });
-    }
+  try {
+    const messages = await Message.find().sort({ createdAt: 1 });
+    res.json(messages);
+  } catch (err) {
+    res.status(500).json({ error: '获取留言失败' });
+  }
 });
 
 // 添加留言
 app.post('/messages', async (req, res) => {
-    const { message } = req.body;
-    if (!message) {
-        return res.status(400).json({ error: '留言内容不能为空' });
-    }
+  const { message } = req.body;
+  if (!message) {
+    return res.status(400).json({ error: '留言内容不能为空' });
+  }
 
-    const avatarIndex = Math.floor(Math.random() * AVATAR_COUNT) + 1;
+  const avatarIndex = Math.floor(Math.random() * AVATAR_COUNT) + 1;
 
-    // 获取客户端 IP，取第一个有效 IP
-    let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || '';
-    if (ip.includes(',')) {
-        ip = ip.split(',')[0].trim();
-    }
-    // if (ip === '::1' || ip === '127.0.0.1') {
-    //     ip = '123.125.71.38'; // 北京 IP 测试用
-    // }
+  // 获取 IP 地址
+  let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || '';
+  if (ip.includes(',')) ip = ip.split(',')[0].trim();
+  ip = ip.replace('::ffff:', ''); // IPv4 映射格式
 
-    const geo = geoip.lookup(ip);
-    let location = '';
+  let location = '';
 
-    if (geo) {
-        const country = geo.country || '';
-        const city = geo.city || '';
+  try {
+    const response = await axios.get(`http://ip-api.com/json/${ip}?lang=zh-CN`);
+    const data = response.data;
 
-        if (!country) {
-            location = '';
-        } else if (country === 'CN') {
-            location = city || '中国';
-        } else {
-            location = city ? `${country}·${city}` : country;
-        }
+    if (data.status === 'success') {
+      const country = data.country || '';
+      const regionName = data.regionName || '';
+      const city = data.city || '';
+
+      if (country === '中国') {
+        // 中国用户只显示省或市
+        location = city || regionName || '中国';
+      } else {
+        // 外国用户显示 国家·城市
+        location = city ? `${country}·${city}` : country;
+      }
     } else {
-        location = '未知';
+      location = '未知';
     }
+  } catch (error) {
+    console.error('IP 位置获取失败:', error.message);
+    location = '未知';
+  }
 
-    console.log(location);
+  try {
+    const newMessage = await Message.create({
+      message,
+      avatarIndex,
+      createdAt: new Date(),
+      location,
+    });
 
-    try {
-        const newMessage = await Message.create({
-            message,
-            avatarIndex,
-            createdAt: new Date(),
-            location // 保存位置信息
-        });
-
-        console.log(newMessage);
-
-        res.status(201).json(newMessage);
-    } catch (err) {
-        res.status(500).json({ error: '保存留言失败' });
-    }
+    res.status(201).json(newMessage);
+  } catch (err) {
+    res.status(500).json({ error: '保存留言失败' });
+  }
 });
-
 
 // 删除留言
 app.delete('/messages/:id', async (req, res) => {
-    try {
-        const deleted = await Message.findByIdAndDelete(req.params.id);
-        if (!deleted) return res.status(404).json({ error: '未找到该留言' });
-        res.sendStatus(204);
-    } catch (err) {
-        res.status(500).json({ error: '删除失败' });
-    }
+  try {
+    const deleted = await Message.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: '未找到该留言' });
+    res.sendStatus(204);
+  } catch (err) {
+    res.status(500).json({ error: '删除失败' });
+  }
 });
 
 app.listen(port, () => {
-    console.log(`留言板服务器运行在 http://localhost:${port}`);
+  console.log(`留言板服务器运行在 http://localhost:${port}`);
 });
