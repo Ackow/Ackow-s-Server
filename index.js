@@ -49,9 +49,9 @@ app.post('/messages', async (req, res) => {
     if (ip.includes(',')) {
         ip = ip.split(',')[0].trim();
     }
-    if (ip === '::1' || ip === '127.0.0.1') {
-        ip = '123.125.71.38'; // 北京 IP 测试用
-    }
+    // if (ip === '::1' || ip === '127.0.0.1') {
+    //     ip = '123.125.71.38'; // 北京 IP 测试用
+    // }
 
     const geo = geoip.lookup(ip);
     let location = '';
@@ -68,7 +68,7 @@ app.post('/messages', async (req, res) => {
             location = city ? `${country}·${city}` : country;
         }
     } else {
-        location = '未知位置';
+        location = '未知';
     }
 
     console.log(location);
